@@ -6,12 +6,12 @@ namespace WaterProject.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class WaterController : ControllerBase
+    public class BookController : ControllerBase
     {
-        private WaterDBContext _waterContext;
-        public WaterController(WaterDBContext temp) => _waterContext = temp;
+        private BookDBContext _bookContext;
+        public BookController(BookDBContext temp) => _bookContext = temp;
         [HttpGet("AllProjects")]
-        public IActionResult GetProjects(int pageSize = 10, int pageNum = 1)
+        public IActionResult GetProjects(int pageSize = 5, int pageNum = 1)
         {
             string? favProjType = Request.Cookies["favoriteProjectType"];
             Console.WriteLine("~~~~~COOKIE~~~~~\n" + favProjType);
@@ -24,25 +24,19 @@ namespace WaterProject.API.Controllers
                 Expires = DateTime.Now.AddMinutes(1)
             });
 
-            var something = _waterContext.Projects
+            var something = _bookContext.Books
             .Skip((pageNum - 1) * pageSize)
             .Take(pageSize)
             .ToList();
 
-            var totalNumProjects = _waterContext.Projects.Count();
+            var totalNumBooks = _bookContext.Books.Count();
 
             var someObject = new
             {
                 Projects = something,
-                TotalNumProjects = totalNumProjects
+                TotalNumProjects = totalNumBooks
             };
             return Ok(someObject);
-        }
-        [HttpGet("FunctionalProjects")]
-        public IEnumerable<Project> GetFunctionalProjects()
-        {
-            var something = _waterContext.Projects.Where(p => p.ProjectFunctionalityStatus == "Functional").ToList();
-            return something;
         }
     }
 }

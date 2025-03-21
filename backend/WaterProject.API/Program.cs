@@ -10,8 +10,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<WaterDBContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("WaterConnection")));
+builder.Services.AddDbContext<BookDBContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("BookConnection")));
 
 builder.Services.AddCors(options =>
 {

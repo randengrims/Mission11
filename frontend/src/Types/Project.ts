@@ -1,9 +1,11 @@
 export interface Project {
-  projectId: number;
-  projectName: string;
-  projectType: string;
-  projectRegionalProgram: string;
-  projectImpact: number;
-  projectPhase: string;
-  projectFunctionalityStatus: string;
+  bookId: number;
+  title: string;
+  author: string;
+  publisher: string;
+  isbn: string;
+  classification: number;
+  category: string;
+  pageCount: number;
+  price: number;
 }

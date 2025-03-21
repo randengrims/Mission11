@@ -1,53 +1,79 @@
 import { useEffect, useState } from 'react';
 import { Project } from './Types/Project';
 
+interface ProjectApiResponse {
+  projects: Project[];
+  totalNumProjects: number;
+}
+
 function ProjectList() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [books, setBooks] = useState<Project[]>([]);
+  const [pageSize, setPageSize] = useState<number>(5);
   const [pageNum, setPageNum] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
+  const [sortAsc, setSortAsc] = useState<boolean>(true); // Sorting direction
 
   useEffect(() => {
     const fetchProjects = async () => {
       const response = await fetch(
-        `https://localhost:5000/Water/AllProjects?pageSize=${pageSize}&pageNum=${pageNum}`,
+        `https://localhost:5000/Book/AllProjects?pageSize=${pageSize}&pageNum=${pageNum}`,
         {
           credentials: 'include',
         }
       );
-      const data = await response.json();
-      setProjects(data.projects);
+
+      const data: ProjectApiResponse = await response.json();
+
+      const sortedBooks = [...data.projects].sort((a: Project, b: Project) => {
+        const titleA = a.title.toLowerCase();
+        const titleB = b.title.toLowerCase();
+        if (sortAsc) return titleA.localeCompare(titleB);
+        else return titleB.localeCompare(titleA);
+      });
+
+      setBooks(sortedBooks);
       setTotalItems(data.totalNumProjects);
-      setTotalPages(Math.ceil(totalItems / pageSize));
+      setTotalPages(Math.ceil(data.totalNumProjects / pageSize));
     };
 
     fetchProjects();
-  }, [pageSize, pageNum]);
+  }, [pageSize, pageNum, sortAsc]);
+
+  const toggleSort = () => {
+    setSortAsc(!sortAsc);
+  };
 
   return (
     <>
-      <h1>Water Projects</h1>
+      <h1>Book List</h1>
+      <button onClick={toggleSort}>Sort by Title {sortAsc ? '▲' : '▼'}</button>
       <br />
-      {projects.map((p) => (
-        <div id="projectCard" className="card" key={p.projectId}>
-          <h3 className="card-title">{p.projectName}</h3>
+      <br />
+
+      {books.map((b) => (
+        <div id="projectCard" className="card" key={b.bookId}>
+          <h3 className="card-title">{b.title}</h3>
           <div className="card-body">
             <ul className="list-unstyled">
               <li>
-                <strong>Project Type:</strong> {p.projectType}
+                <strong>Author:</strong> {b.author}
               </li>
               <li>
-                <strong>Regional Program:</strong> {p.projectRegionalProgram}
+                <strong>Publisher:</strong> {b.publisher}
               </li>
               <li>
-                <strong>Impact:</strong> {p.projectImpact} Individuals Served
+                <strong>ISBN:</strong> {b.isbn}
               </li>
               <li>
-                <strong>Project Phase:</strong> {p.projectPhase}
+                <strong>Classification/Category:</strong> {b.classification} /{' '}
+                {b.category}
               </li>
               <li>
-                <strong>Project Status:</strong> {p.projectFunctionalityStatus}
+                <strong>Number of Pages:</strong> {b.pageCount}
+              </li>
+              <li>
+                <strong>Price:</strong> {b.price}
               </li>
             </ul>
           </div>
@@ -76,11 +102,9 @@ function ProjectList() {
       </button>
 
       <br />
-      <label htmlFor="">
+      <label>
         Results per page:
         <select
-          name=""
-          id=""
           value={pageSize}
           onChange={(p) => {
             setPageSize(Number(p.target.value));
