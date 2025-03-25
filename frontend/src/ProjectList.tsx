@@ -6,7 +6,7 @@ interface ProjectApiResponse {
   totalNumProjects: number;
 }
 
-function ProjectList() {
+function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
   const [books, setBooks] = useState<Project[]>([]);
   const [pageSize, setPageSize] = useState<number>(5);
   const [pageNum, setPageNum] = useState<number>(1);
@@ -16,8 +16,12 @@ function ProjectList() {
 
   useEffect(() => {
     const fetchProjects = async () => {
+      const categoryParams = selectedCategories
+        .map((cat) => `bookTypes=${encodeURIComponent(cat)}`)
+        .join('&'); // This might be the thing that doesnt work. Switch to 'projectTypes'
+
       const response = await fetch(
-        `https://localhost:5000/Book/AllProjects?pageSize=${pageSize}&pageNum=${pageNum}`,
+        `https://localhost:5000/Book/AllProjects?pageSize=${pageSize}&pageNum=${pageNum}${selectedCategories.length ? `&${categoryParams}` : ''}`,
         {
           credentials: 'include',
         }
@@ -38,7 +42,7 @@ function ProjectList() {
     };
 
     fetchProjects();
-  }, [pageSize, pageNum, sortAsc]);
+  }, [pageSize, pageNum, sortAsc, selectedCategories]);
 
   const toggleSort = () => {
     setSortAsc(!sortAsc);
@@ -46,7 +50,6 @@ function ProjectList() {
 
   return (
     <>
-      <h1>Book List</h1>
       <button onClick={toggleSort}>Sort by Title {sortAsc ? '▲' : '▼'}</button>
       <br />
       <br />

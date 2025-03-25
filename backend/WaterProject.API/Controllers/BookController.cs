@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WaterProject.API.Data;
 
@@ -11,8 +12,9 @@ namespace WaterProject.API.Controllers
         private BookDBContext _bookContext;
         public BookController(BookDBContext temp) => _bookContext = temp;
         [HttpGet("AllProjects")]
-        public IActionResult GetProjects(int pageSize = 5, int pageNum = 1)
+        public IActionResult GetProjects(int pageSize = 5, int pageNum = 1, [FromQuery] List<string>? bookTypes = null)
         {
+
             string? favProjType = Request.Cookies["favoriteProjectType"];
             Console.WriteLine("~~~~~COOKIE~~~~~\n" + favProjType);
 
@@ -24,12 +26,21 @@ namespace WaterProject.API.Controllers
                 Expires = DateTime.Now.AddMinutes(1)
             });
 
-            var something = _bookContext.Books
+            var query = _bookContext.Books.AsQueryable();
+
+            if (bookTypes != null && bookTypes.Any())
+            {
+                query = query.Where(b => bookTypes.Contains(b.Category));
+            }
+
+            var totalNumBooks = query.Count();
+
+
+            var something = query
             .Skip((pageNum - 1) * pageSize)
             .Take(pageSize)
             .ToList();
 
-            var totalNumBooks = _bookContext.Books.Count();
 
             var someObject = new
             {
@@ -37,6 +48,16 @@ namespace WaterProject.API.Controllers
                 TotalNumProjects = totalNumBooks
             };
             return Ok(someObject);
+        }
+
+        [HttpGet("GetBookType")]
+        public IActionResult GetBookTypes ()
+        {
+            var bookTypes = _bookContext.Books
+                .Select(b => b.Category)
+                .Distinct()
+                .ToList();
+            return Ok(bookTypes);
         }
     }
 }
