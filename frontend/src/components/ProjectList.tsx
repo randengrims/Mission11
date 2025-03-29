@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Project } from './Types/Project';
+import { Project } from '../Types/Project';
+import { useNavigate } from 'react-router-dom';
 
 interface ProjectApiResponse {
   projects: Project[];
@@ -13,6 +14,7 @@ function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
   const [totalItems, setTotalItems] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [sortAsc, setSortAsc] = useState<boolean>(true); // Sorting direction
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -76,9 +78,16 @@ function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
                 <strong>Number of Pages:</strong> {b.pageCount}
               </li>
               <li>
-                <strong>Price:</strong> {b.price}
+                <strong>Price:</strong> ${b.price}
               </li>
             </ul>
+
+            <button
+              className="btn btn-success"
+              onClick={() => navigate('/addtocart')}
+            >
+              Add to Cart
+            </button>
           </div>
         </div>
       ))}
