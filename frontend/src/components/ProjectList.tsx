@@ -57,39 +57,61 @@ function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
       <br />
 
       {books.map((b) => (
-        <div id="projectCard" className="card" key={b.bookId}>
-          <h3 className="card-title">{b.title}</h3>
-          <div className="card-body">
-            <ul className="list-unstyled">
-              <li>
-                <strong>Author:</strong> {b.author}
-              </li>
-              <li>
-                <strong>Publisher:</strong> {b.publisher}
-              </li>
-              <li>
-                <strong>ISBN:</strong> {b.isbn}
-              </li>
-              <li>
-                <strong>Classification/Category:</strong> {b.classification} /{' '}
-                {b.category}
-              </li>
-              <li>
-                <strong>Number of Pages:</strong> {b.pageCount}
-              </li>
-              <li>
-                <strong>Price:</strong> ${b.price}
-              </li>
-            </ul>
-
-            <button
-              className="btn btn-success"
-              onClick={() =>
-                navigate(`/addtocart/${b.title}/${b.bookId}/${b.price}`)
-              }
+        <div
+          className="accordion mb-3"
+          id={`accordion-${b.bookId}`}
+          key={b.bookId}
+        >
+          <div className="accordion-item">
+            <h2 className="accordion-header" id={`heading-${b.bookId}`}>
+              <button
+                className="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target={`#collapse-${b.bookId}`}
+                aria-expanded="false"
+                aria-controls={`collapse-${b.bookId}`}
+              >
+                {b.title}
+              </button>
+            </h2>
+            <div
+              id={`collapse-${b.bookId}`}
+              className="accordion-collapse collapse"
+              aria-labelledby={`heading-${b.bookId}`}
+              data-bs-parent={`#accordion-${b.bookId}`}
             >
-              Add to Cart
-            </button>
+              <div className="accordion-body">
+                <ul className="list-unstyled">
+                  <li>
+                    <strong>Author:</strong> {b.author}
+                  </li>
+                  <li>
+                    <strong>Publisher:</strong> {b.publisher}
+                  </li>
+                  <li>
+                    <strong>ISBN:</strong> {b.isbn}
+                  </li>
+                  <li>
+                    <strong>Category:</strong> {b.classification} / {b.category}
+                  </li>
+                  <li>
+                    <strong>Pages:</strong> {b.pageCount}
+                  </li>
+                  <li>
+                    <strong>Price:</strong> ${b.price}
+                  </li>
+                </ul>
+                <button
+                  className="btn btn-success mt-2"
+                  onClick={() =>
+                    navigate(`/addtocart/${b.title}/${b.bookId}/${b.price}`)
+                  }
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       ))}
