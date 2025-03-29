@@ -10,7 +10,8 @@ function AddToCart() {
   const { itemAddToCart } = useCart();
 
   const handleAddToCart = () => {
-    const newitem: CartItem = {
+    const newitem: CartItem =
+     {
       bookId: Number(bookId),
       title: title || 'No title found',
       price: Number(price),
