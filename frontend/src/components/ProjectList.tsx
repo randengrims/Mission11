@@ -84,7 +84,7 @@ function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
 
             <button
               className="btn btn-success"
-              onClick={() => navigate('/addtocart')}
+              onClick={() => navigate(`/addtocart/${b.title} / ${b.bookId}`)}
             >
               Add to Cart
             </button>
