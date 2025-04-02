@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Project } from '../Types/Project';
 import { useNavigate } from 'react-router-dom';
+import { fetchBooks } from '../api/BooksAPI';
 
 interface ProjectApiResponse {
   projects: Project[];
@@ -11,40 +12,41 @@ function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
   const [books, setBooks] = useState<Project[]>([]);
   const [pageSize, setPageSize] = useState<number>(5);
   const [pageNum, setPageNum] = useState<number>(1);
-  const [totalItems, setTotalItems] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [sortAsc, setSortAsc] = useState<boolean>(true); // Sorting direction
   const navigate = useNavigate();
+  const [error, setError] = useState<String | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      const categoryParams = selectedCategories
-        .map((cat) => `bookTypes=${encodeURIComponent(cat)}`)
-        .join('&'); // This might be the thing that doesnt work. Switch to 'projectTypes'
+    const loadProjects = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchBooks(pageSize, pageNum, selectedCategories);
 
-      const response = await fetch(
-        `https://localhost:5000/Book/AllProjects?pageSize=${pageSize}&pageNum=${pageNum}${selectedCategories.length ? `&${categoryParams}` : ''}`,
-        {
-          credentials: 'include',
-        }
-      );
+        const sortedBooks = [...data.projects].sort(
+          (a: Project, b: Project) => {
+            const titleA = a.title.toLowerCase();
+            const titleB = b.title.toLowerCase();
+            if (sortAsc) return titleA.localeCompare(titleB);
+            else return titleB.localeCompare(titleA);
+          }
+        );
 
-      const data: ProjectApiResponse = await response.json();
-
-      const sortedBooks = [...data.projects].sort((a: Project, b: Project) => {
-        const titleA = a.title.toLowerCase();
-        const titleB = b.title.toLowerCase();
-        if (sortAsc) return titleA.localeCompare(titleB);
-        else return titleB.localeCompare(titleA);
-      });
-
-      setBooks(sortedBooks);
-      setTotalItems(data.totalNumProjects);
-      setTotalPages(Math.ceil(data.totalNumProjects / pageSize));
+        setBooks(sortedBooks);
+        setTotalPages(Math.ceil(data.totalNumProjects / pageSize));
+      } catch (error) {
+        setError((error as Error).message);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchProjects();
+    loadProjects();
   }, [pageSize, pageNum, sortAsc, selectedCategories]);
+
+  if (loading) return <p>Loading books...</p>;
+  if (error) return <p className="text-red-500">Error {error}</p>;
 
   const toggleSort = () => {
     setSortAsc(!sortAsc);
