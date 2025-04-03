@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchBooks } from '../api/BooksAPI';
 
 interface ProjectApiResponse {
+  // Delete this code block if necessary. Not in vids, just bootstrap i think
   projects: Project[];
   totalNumProjects: number;
 }
@@ -24,16 +25,23 @@ function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
         setLoading(true);
         const data = await fetchBooks(pageSize, pageNum, selectedCategories);
 
-        const sortedBooks = [...data.projects].sort(
-          (a: Project, b: Project) => {
-            const titleA = a.title.toLowerCase();
-            const titleB = b.title.toLowerCase();
-            if (sortAsc) return titleA.localeCompare(titleB);
-            else return titleB.localeCompare(titleA);
-          }
-        );
+        // const sortedBooks = [...data.projects].sort(
+        //   (a: Project, b: Project) => {
+        //     const titleA = a.title.toLowerCase();
+        //     const titleB = b.title.toLowerCase();
+        //     if (sortAsc) return titleA.localeCompare(titleB);
+        //     else return titleB.localeCompare(titleA);
+        //   }
+        // );
+        console.log('API response:', data); // chat added
+        console.log('books:', data.books); // chat added
 
-        setBooks(sortedBooks);
+        if (data.books) {
+          setBooks(data.books);
+        } else {
+          console.error('⚠️ data.books is undefined!', data);
+        }
+        // this was sortedBooks from above
         setTotalPages(Math.ceil(data.totalNumProjects / pageSize));
       } catch (error) {
         setError((error as Error).message);

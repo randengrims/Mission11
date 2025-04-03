@@ -1,7 +1,7 @@
 import { Project } from '../Types/Project';
 
-interface fetchBooksResponse {
-  projects: Project[];
+export interface fetchBooksResponse {
+  books: Project[];
   totalNumProjects: number;
 }
 
@@ -32,7 +32,7 @@ export const fetchBooks = async (
 
     // Map from backend field names (books, totalNumBooks) to what the component expects (projects, totalNumProjects)
     return {
-      projects: json.books,
+      books: json.books,
       totalNumProjects: json.totalNumBooks,
     };
   } catch (error) {

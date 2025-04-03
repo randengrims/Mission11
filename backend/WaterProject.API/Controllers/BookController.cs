@@ -44,8 +44,8 @@ namespace WaterProject.API.Controllers
 
             var someObject = new
             {
-                Projects = something,
-                TotalNumProjects = totalNumBooks
+                projects = something,
+                totalNumProjects = totalNumBooks
             };
             return Ok(someObject);
         }
